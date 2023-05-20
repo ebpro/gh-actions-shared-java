@@ -116,6 +116,7 @@ jobs:
               --color always \
               --settings ci-settings.xml \
               --activate-profiles jacoco \
+              -P github \
               ${{ inputs.maven-args }} \
               ${{ inputs.verify-goal }}
 
@@ -131,6 +132,7 @@ jobs:
             -DskipTests=true \
             --color always \
             --settings ci-settings.xml \
+            -P github \
             -Dsonar.branch.name=$MY_BRANCH \
             -activate-profiles jacoco,sonar \
             sonar:sonar
