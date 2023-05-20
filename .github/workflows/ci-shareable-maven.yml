@@ -47,6 +47,8 @@ env:
   SONAR_TOKEN: ${{secrets.SONAR_TOKEN}}
   DOCKERHUB_USERNAME: ${{secrets.DOCKERHUB_USERNAME}}
   DOCKERHUB_TOKEN: ${{secrets.DOCKERHUB_TOKEN}}
+  SIGN_KEY_PASS: $${{secrets.SIGN_KEY_PASS}}
+  SIGN_KEY: ${{secrets.SIGN_KEY}}
 
 # allow single build per branch or PR
 concurrency:
