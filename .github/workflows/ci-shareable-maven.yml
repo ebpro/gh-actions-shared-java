@@ -98,6 +98,7 @@ jobs:
               --batch-mode \
               --show-version \
               --update-snapshots \
+              --settings ci-settings.xml \
               org.apache.maven.plugins:maven-wrapper-plugin:3.2.0:wrapper \
               -Dmaven="${{ matrix.maven }}"
 
