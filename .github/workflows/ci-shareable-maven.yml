@@ -47,7 +47,7 @@ env:
   SONAR_TOKEN: ${{secrets.SONAR_TOKEN}}
   DOCKERHUB_USERNAME: ${{secrets.DOCKERHUB_USERNAME}}
   DOCKERHUB_TOKEN: ${{secrets.DOCKERHUB_TOKEN}}
-  SIGN_KEY_PASS: $${{secrets.SIGN_KEY_PASS}}
+  SIGN_KEY_PASS: ${{secrets.SIGN_KEY_PASS}}
   SIGN_KEY: ${{secrets.SIGN_KEY}}
 
 # allow single build per branch or PR
@@ -76,7 +76,8 @@ jobs:
         with:
           fetch-depth: 0
       # Setups git user name and email
-      - run: |
+      - name: Set up git User
+        run: |
           git config --global user.name github-actions
           git config --global user.email github-actions@github.com        
       # Maven is not installed in self hosted
