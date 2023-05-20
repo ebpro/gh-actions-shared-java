@@ -92,7 +92,7 @@ jobs:
           check-latest: true
           cache: 'maven'
       # Setup maven version as a wrapper
-      - name: Set up Maven
+      - name: Set up Maven Wrapper
         run: >
           mvn --errors \
               --batch-mode \
