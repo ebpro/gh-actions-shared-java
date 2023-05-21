@@ -50,7 +50,7 @@ env:
   DOCKERHUB_TOKEN: ${{secrets.DOCKERHUB_TOKEN}}
   SIGN_KEY_PASS: ${{secrets.SIGN_KEY_PASS}}
   SIGN_KEY: ${{secrets.SIGN_KEY}}
-
+  MAVEN_ARGS: --errors --batch-mode --show-version --update-snapshots --settings ci-settings.xml --color always
 
 # allow single build per branch or PR
 concurrency:
@@ -99,12 +99,7 @@ jobs:
       # Setup maven version as a wrapper
       - name: Set up Maven Wrapper
         run: >
-          mvn --errors \
-              --batch-mode \
-              --show-version \
-              --update-snapshots \
-              --settings ci-settings.xml \
-              org.apache.maven.plugins:maven-wrapper-plugin:3.2.0:wrapper \
+          mvn ${{ env.MAVEN_ARGS }} org.apache.maven.plugins:maven-wrapper-plugin:3.2.0:wrapper \
               -Dmaven="${{ matrix.maven }}"
 
       - name: Extract branch name
@@ -114,14 +109,7 @@ jobs:
       # Build and test
       - name: Build and Test with Maven
         run: >
-          ./mvnw --errors \
-              --show-version \
-              --batch-mode \
-              --update-snapshots \
-              --color always \
-              --settings ci-settings.xml \
-              --activate-profiles jacoco \
-              -P github \
+          ./mvnw ${{ env.MAVEN_ARGS }} --activate-profiles jacoco
               ${{ inputs.maven-args }} \
               ${{ inputs.verify-goal }}
 
@@ -131,13 +119,8 @@ jobs:
         shell: bash
         if: env.SONAR_URL != null && env.SONAR_TOKEN != null
         run: >
-          ./mvnw --errors \
-            --show-version \
-            --batch-mode \
+          ./mvnw ${{ env.MAVEN_ARGS }} \
             -DskipTests=true \
-            --color always \
-            --settings ci-settings.xml \
-            -P github \
             -Dsonar.branch.name=$MY_BRANCH \
             -activate-profiles jacoco,sonar \
             sonar:sonar
@@ -152,9 +135,11 @@ jobs:
       
       # Publish package
       - name: Publish package
-        run: mvn --batch-mode deploy
+        run: >
+          ./mvnw ${{ env.MAVEN_ARGS }} \
+            deploy
       
-        ## Build and deploy project site      
+      ## Build and deploy project site      
       - name: Install SSH Key
         if: ${{github.ref == 'refs/heads/develop'}}
         uses: webfactory/ssh-agent@v0.7.0
@@ -164,9 +149,5 @@ jobs:
       - name: Build and deploy site with Maven
         if: ${{github.ref == 'refs/heads/develop'}}
         run: >
-          ./mvnw --errors \
-              --show-version \
-              --batch-mode \
-              --color always \
-              --settings ci-settings.xml \
-              site:site site-deploy
+          ./mvnw ${{ env.MAVEN_ARGS }} \
+            site:site site-deploy
