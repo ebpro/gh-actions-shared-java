@@ -142,12 +142,17 @@ jobs:
 
       # Stage artifact
       - name: Stage artifacts
-        uses: actions/upload-artifact@v3
+        run: mkdir staging && cp target/*.{jar,war,ear} staging
+      - uses: actions/upload-artifact@v3
         with:
           name: Package
-          path: target/*.jar
-
-      ## Build and deploy project site      
+          path: staging
+      
+      # Publish package
+      - name: Publish package
+        run: mvn --batch-mode deploy
+      
+        ## Build and deploy project site      
       - name: Install SSH Key
         if: ${{github.ref == 'refs/heads/develop'}}
         uses: webfactory/ssh-agent@v0.7.0
