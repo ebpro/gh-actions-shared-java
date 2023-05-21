@@ -109,9 +109,8 @@ jobs:
       # Build and test
       - name: Build and Test with Maven
         run: >
-          ./mvnw ${{ env.MAVEN_ARGS }} --activate-profiles jacoco
-              ${{ inputs.maven-args }} \
-              ${{ inputs.verify-goal }}
+          ./mvnw ${{ env.MAVEN_ARGS }} --activate-profiles jacoco \
+              ${{ inputs.maven-args }} ${{ inputs.verify-goal }}
 
       # Check quality with SonarQube
         ### THIS STEP MUST BE ENABLED BY CONFIGURING : SONAR_URL and SONAR_TOKEN secrets.
