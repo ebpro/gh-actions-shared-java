@@ -41,14 +41,16 @@ on:
           type: string
 
 env:
-  GITHUB_ACTOR: ${{secrets.GITHUB_ACTOR}}
-  GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+  GITHUB_ACTOR: ${{secrets.GITHUBACTOR}}
+  GITHUB_TOKEN: ${{secrets.GITHUBTOKEN}}
+  GITHUB_ORG: ${{secrets.GITHUBORG}}
   SONAR_URL: ${{secrets.SONAR_URL}}
   SONAR_TOKEN: ${{secrets.SONAR_TOKEN}}
   DOCKERHUB_USERNAME: ${{secrets.DOCKERHUB_USERNAME}}
   DOCKERHUB_TOKEN: ${{secrets.DOCKERHUB_TOKEN}}
   SIGN_KEY_PASS: ${{secrets.SIGN_KEY_PASS}}
   SIGN_KEY: ${{secrets.SIGN_KEY}}
+
 
 # allow single build per branch or PR
 concurrency:
