@@ -50,7 +50,7 @@ env:
   DOCKERHUB_TOKEN: ${{secrets.DOCKERHUB_TOKEN}}
   SIGN_KEY_PASS: ${{secrets.SIGN_KEY_PASS}}
   SIGN_KEY: ${{secrets.SIGN_KEY}}
-  MAVEN_ARGS: --errors --batch-mode --show-version --update-snapshots --settings ci-settings.xml --color always
+  MAVEN_ARGS: --errors --batch-mode --show-version --update-snapshots --settings ci-settings.xml --color always -P github
 
 # allow single build per branch or PR
 concurrency:
@@ -109,7 +109,7 @@ jobs:
       # Build and test
       - name: Build and Test with Maven
         run: >
-          ./mvnw ${{ env.MAVEN_ARGS }} --activate-profiles jacoco \
+          ./mvnw ${{ env.MAVEN_ARGS }} -P gpgsigning  --activate-profiles jacoco \
               ${{ inputs.maven-args }} ${{ inputs.verify-goal }}
 
       # Check quality with SonarQube
