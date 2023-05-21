@@ -142,7 +142,7 @@ jobs:
 
       # Stage artifact
       - name: Stage artifacts
-        run: mkdir staging && find ./target -name \*.{jar,war,ear} -exec cp {} ./staging \;
+        run: mkdir staging && find ./target -name \*.[jwe]ar -exec cp {} ./staging \; && ls staging
       - uses: actions/upload-artifact@v3
         with:
           name: Package
