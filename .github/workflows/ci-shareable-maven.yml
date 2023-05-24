@@ -50,7 +50,9 @@ env:
   DOCKERHUB_TOKEN: ${{secrets.DOCKERHUB_TOKEN}}
   SIGN_KEY_PASS: ${{secrets.SIGN_KEY_PASS}}
   SIGN_KEY: ${{secrets.SIGN_KEY}}
-  MAVEN_ARGS: --errors --batch-mode --show-version --update-snapshots --settings ci-settings.xml --color always -P github
+  MAVENPROXY_USERNAME: ${{secrets.MAVENPROXY_USERNAME}}
+  MAVENPROXY_TOKEN: ${{secrets.MAVENPROXY_TOKEN}}
+  MAVEN_ARGS: --errors --batch-mode --show-version --update-snapshots --settings ci-settings.xml --color always -P github,nexus --no-transfer-progress  
 
 # allow single build per branch or PR
 concurrency:
