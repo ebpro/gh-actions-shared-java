@@ -52,7 +52,7 @@ env:
   SIGN_KEY: ${{secrets.SIGN_KEY}}
   MAVENPROXY_USERNAME: ${{secrets.MAVENPROXY_USERNAME}}
   MAVENPROXY_TOKEN: ${{secrets.MAVENPROXY_TOKEN}}
-  MAVEN_ARGS: --errors --batch-mode --show-version --update-snapshots --settings ci-settings.xml --color always -P github,nexus --no-transfer-progress  
+  MAVEN_ARGS: --errors --batch-mode --show-version --update-snapshots --settings ci-settings.xml --color always --no-transfer-progress  
 
 # allow single build per branch or PR
 concurrency:
@@ -111,7 +111,7 @@ jobs:
       # Build and test
       - name: Build and Test with Maven
         run: >
-          ./mvnw ${{ env.MAVEN_ARGS }} -P gpgsigning  --activate-profiles jacoco \
+          ./mvnw ${{ env.MAVEN_ARGS }} --activate-profiles jacoco,javadoc,gpgsigning \
               ${{ inputs.maven-args }} ${{ inputs.verify-goal }}
 
       # Check quality with SonarQube
