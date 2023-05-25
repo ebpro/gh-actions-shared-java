@@ -121,7 +121,7 @@ jobs:
           ./mvnw ${{ inputs.maven-args }} \
             -DskipTests=true \
             -Dsonar.branch.name=$MY_BRANCH \
-            -activate-profiles jacoco,sonar \
+            --activate-profiles jacoco,sonar \
             sonar:sonar
 
       # Stage artifact
