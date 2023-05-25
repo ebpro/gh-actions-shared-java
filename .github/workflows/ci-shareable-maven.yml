@@ -52,7 +52,6 @@ env:
   SIGN_KEY: ${{secrets.SIGN_KEY}}
   MAVENPROXY_USERNAME: ${{secrets.MAVENPROXY_USERNAME}}
   MAVENPROXY_TOKEN: ${{secrets.MAVENPROXY_TOKEN}}
-  MAVEN_ARGS: --errors --batch-mode --show-version --update-snapshots --settings ci-settings.xml --color always --no-transfer-progress  
 
 # allow single build per branch or PR
 concurrency:
@@ -101,7 +100,7 @@ jobs:
       # Setup maven version as a wrapper
       - name: Set up Maven Wrapper
         run: >
-          mvn ${{ env.MAVEN_ARGS }} org.apache.maven.plugins:maven-wrapper-plugin:3.2.0:wrapper \
+          mvn ${{ inputs.maven-args }} org.apache.maven.plugins:maven-wrapper-plugin:3.2.0:wrapper \
               -Dmaven="${{ matrix.maven }}"
 
       - name: Extract branch name
@@ -111,8 +110,7 @@ jobs:
       # Build and test
       - name: Build and Test with Maven
         run: >
-          ./mvnw ${{ env.MAVEN_ARGS }} --activate-profiles jacoco,javadoc,gpgsigning \
-              ${{ inputs.maven-args }} ${{ inputs.verify-goal }}
+          ./mvnw ${{ inputs.maven-args }} ${{ inputs.verify-goal }}
 
       # Check quality with SonarQube
         ### THIS STEP MUST BE ENABLED BY CONFIGURING : SONAR_URL and SONAR_TOKEN secrets.
@@ -120,7 +118,7 @@ jobs:
         shell: bash
         if: env.SONAR_URL != null && env.SONAR_TOKEN != null
         run: >
-          ./mvnw ${{ env.MAVEN_ARGS }} \
+          ./mvnw ${{ inputs.maven-args }} \
             -DskipTests=true \
             -Dsonar.branch.name=$MY_BRANCH \
             -activate-profiles jacoco,sonar \
@@ -137,8 +135,7 @@ jobs:
       # Publish package
       - name: Publish package
         run: >
-          ./mvnw ${{ env.MAVEN_ARGS }} \
-            deploy
+          ./mvnw ${{ inputs.maven-args }} deploy
       
       ## Build and deploy project site      
       - name: Install SSH Key
@@ -150,5 +147,5 @@ jobs:
       - name: Build and deploy site with Maven
         if: ${{github.ref == 'refs/heads/develop'}}
         run: >
-          ./mvnw ${{ env.MAVEN_ARGS }} \
+          ./mvnw ${{ inputs.maven-args }} \
             site:site site-deploy
