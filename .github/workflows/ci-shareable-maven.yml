@@ -41,17 +41,18 @@ on:
           type: string
 
 env:
-  GITHUBACTOR: ${{secrets.GITHUBACTOR}}
-  GITHUBTOKEN: ${{secrets.GITHUBTOKEN}}
-  GITHUBORG: ${{secrets.GITHUBORG}}
-  SONAR_URL: ${{secrets.SONAR_URL}}
-  SONAR_TOKEN: ${{secrets.SONAR_TOKEN}}
-  DOCKERHUB_USERNAME: ${{secrets.DOCKERHUB_USERNAME}}
-  DOCKERHUB_TOKEN: ${{secrets.DOCKERHUB_TOKEN}}
-  SIGN_KEY_PASS: ${{secrets.SIGN_KEY_PASS}}
-  SIGN_KEY: ${{secrets.SIGN_KEY}}
-  MAVENPROXY_USERNAME: ${{secrets.MAVENPROXY_USERNAME}}
-  MAVENPROXY_TOKEN: ${{secrets.MAVENPROXY_TOKEN}}
+  GITHUBACTOR: ${{ secrets.GITHUBACTOR }}
+  GITHUBTOKEN: ${{ secrets.GITHUBTOKEN }}
+  GITHUBORG: ${{ secrets.GITHUBORG }}
+  SONAR_URL: ${{ secrets.SONAR_URL }}
+  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+  DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+  SIGN_KEY_PASS: ${{ secrets.SIGN_KEY_PASS }}
+  SIGN_KEY: ${{ secrets.SIGN_KEY }}
+  MAVENPROXY_URL: ${{ env.MAVENPROXY_URL }}
+  MAVENPROXY_USERNAME: ${{ secrets.MAVENPROXY_USERNAME }}
+  MAVENPROXY_TOKEN: ${{ secrets.MAVENPROXY_TOKEN }}
 
 # allow single build per branch or PR
 concurrency:
