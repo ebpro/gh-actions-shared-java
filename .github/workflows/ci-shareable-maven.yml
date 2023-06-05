@@ -35,10 +35,39 @@ on:
           type: string
     
         verify-goal:
-          description: The Maven goal used by verify jobs
+          description: The Maven goal used to verify jobs
           required: false
           default: 'verify'
           type: string
+        
+        quality-goal:
+            description: The Maven goal used to check code quality
+            required: false
+            default: >
+              -DskipTests=true \
+              -Dsonar.branch.name=$MY_BRANCH \
+              --activate-profiles jacoco,sonar \
+              sonar:sonar
+            type: string      
+
+        deploy-goal:
+            description: The Maven goal used deploy project
+            required: false
+            default: 'deploy'
+            type: string
+
+        site-goal:
+            description: The Maven goal used to build and deploy web site
+            required: false
+            default: 'site:site site-deploy'
+            type: string
+
+        staging-command:
+            description: The command to make a staging directory containing artefacts.
+            required: false
+            default: 'mkdir staging && find ./target -name \*.[jwe]ar -exec cp {} ./staging \; && ls staging'
+            type: string
+
 
 env:
   GITHUBACTOR: ${{ secrets.GITHUBACTOR }}
@@ -119,15 +148,11 @@ jobs:
         shell: bash
         if: env.SONAR_URL != null && env.SONAR_TOKEN != null
         run: >
-          ./mvnw ${{ inputs.maven-args }} \
-            -DskipTests=true \
-            -Dsonar.branch.name=$MY_BRANCH \
-            --activate-profiles jacoco,sonar \
-            sonar:sonar
+          ./mvnw ${{ inputs.maven-args }} ${{ inputs.quality-goal }}
 
       # Stage artifact
       - name: Stage artifacts
-        run: mkdir staging && find ./target -name \*.[jwe]ar -exec cp {} ./staging \; && ls staging
+        run: ${{ inputs.staging-command }}
       - uses: actions/upload-artifact@v3
         with:
           name: Package
@@ -136,7 +161,7 @@ jobs:
       # Publish package
       - name: Publish package
         run: >
-          ./mvnw ${{ inputs.maven-args }} deploy
+          ./mvnw ${{ inputs.maven-args }} ${{ inputs.deploy-goal }}
       
       ## Build and deploy project site      
       - name: Install SSH Key
@@ -148,5 +173,4 @@ jobs:
       - name: Build and deploy site with Maven
         if: ${{github.ref == 'refs/heads/develop'}}
         run: >
-          ./mvnw ${{ inputs.maven-args }} \
-            site:site site-deploy
+          ./mvnw ${{ inputs.maven-args }} ${{ inputs.site-goal }}
