@@ -1,0 +1,16 @@
+# Ignore OS generated files
+.DS_Store
+Thumbs.db
+
+# Ignore IDE and editor files
+.idea/
+*.iml
+.vscode/
+
+# Ignore artifacts, logs and reports
+*.log
+*.csv
+*.dat
+*.out
+*.pid
+*.gz
