@@ -4,6 +4,11 @@ name: Java CI (shareable)
 on:
     workflow_call:
       inputs:
+        run-on:
+          description: The runner to use
+          required: false
+          default: 'self-hosted'
+          type: string
         maven-args:
           description: The arguments to pass to all Maven commands when building the code
           required: false
