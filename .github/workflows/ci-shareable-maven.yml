@@ -7,7 +7,7 @@ on:
         run-on:
           description: The runner to use
           required: false
-          default: 'self-hosted'
+          default: '[ self-hosted, Linux ]'
           type: string
         maven-args:
           description: The arguments to pass to all Maven commands when building the code
@@ -98,7 +98,7 @@ jobs:
   maven-build-test-site:
     name: jdk-${{ matrix.jdk }}-${{ matrix.distribution }} ${{ matrix.maven }}
     # The tags to select the runner
-    runs-on: [ self-hosted, Linux ]
+    runs-on: ${{ inputs.run-on }}
 
     strategy:
         matrix:
@@ -148,7 +148,7 @@ jobs:
           ./mvnw ${{ inputs.maven-args }} ${{ inputs.verify-goal }}
 
       # Check quality with SonarQube
-        ### THIS STEP MUST BE ENABLED BY CONFIGURING : SONAR_URL and SONAR_TOKEN secrets.
+        ### THIS STEP MUST BE ENABLED BY CONFIGURING: SONAR_URL and SONAR_TOKEN secrets.
       - name: Quality check with Sonarqube
         shell: bash
         if: env.SONAR_URL != null && env.SONAR_TOKEN != null
