@@ -112,6 +112,7 @@ jobs:
       # checkout the repository
       - uses: actions/checkout@v4
         with:
+          submodules: recursive
           fetch-depth: 0
       # Setups git user name and email
       - name: Set up git User
