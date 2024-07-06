@@ -108,6 +108,8 @@ jobs:
           exclude: ${{ fromJSON( inputs.matrix-exclude ) }}
   
     steps:
+      - name: install dependencies
+        run: sudo apt update && sudo apt install git -y
       ## Environment setup
       # checkout the repository
       - uses: actions/checkout@v4
@@ -117,7 +119,6 @@ jobs:
       # Setups git user name and email
       - name: Set up git User
         run: |
-          sudo apt update && sudo apt install git -y
           git config --global user.name github-actions
           git config --global user.email github-actions@github.com        
       # Maven is not installed in self hosted
