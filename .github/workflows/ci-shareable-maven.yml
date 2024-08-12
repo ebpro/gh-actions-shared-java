@@ -48,7 +48,7 @@ on:
         quality-goal-run:
             description: Should run quality ?
             required: false
-            default: "false"
+            default: 'false'
             type: string
         quality-goal:
             description: The Maven goal used to check code quality
@@ -63,7 +63,7 @@ on:
         deploy-goal-run:
             description: Should deploy ?
             required: false
-            default: "false"
+            default: 'false'
             type: string
         deploy-goal:
             description: The Maven goal used deploy project
@@ -74,7 +74,7 @@ on:
         site-goal-run:
             description: Should genarate and deploy the website ?
             required: false
-            default: "false"
+            default: 'false'
             type: string
         site-goal:
             description: The Maven goal used to build and deploy web site
@@ -85,7 +85,7 @@ on:
         staging-goal-run:
             description: Should stage artefacts ?
             required: false
-            default: "false"
+            default: 'false'
             type: string
         staging-command:
             description: The command to make a staging directory containing artefacts.
@@ -189,7 +189,7 @@ jobs:
       
       # Publish package
       - name: Publish package
-        if: ${{ inputs.deploy-goal-run}}
+        if: ${{ inputs.deploy-goal-run == 'true' }}
         run: >
           ./mvnw ${{ inputs.maven-args }} ${{ inputs.deploy-goal }}
       
