@@ -48,7 +48,7 @@ on:
         quality-goal:
             description: The Maven goal used to check code quality
             required: false
-            default: >
+            default: |
               -DskipTests=true \
               -Dsonar.branch.name=$MY_BRANCH \
               --activate-profiles jacoco,sonar \
