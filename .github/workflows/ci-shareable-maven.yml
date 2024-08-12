@@ -115,7 +115,9 @@ env:
   MAVEN_PROXY_URL: ${{ secrets.MAVEN_PROXY_URL }}
   MAVEN_PROXY_USERNAME: ${{ secrets.MAVEN_PROXY_USERNAME }}
   MAVEN_PROXY_TOKEN: ${{ secrets.MAVEN_PROXY_TOKEN }}
-
+  MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+  MAVEN_CENTRAL_TOKEN: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
+  
 # allow single build per branch or PR
 concurrency:
     group: ${{ github.workflow }}-${{ github.ref }}
