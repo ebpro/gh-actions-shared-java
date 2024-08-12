@@ -68,12 +68,12 @@ on:
         deploy-goal-develop:
             description: The Maven goal used deploy project
             required: false
-            default: '--activate-profiles github deploy'
+            default: '--activate-profiles gpgsigning,github deploy'
             type: string
         deploy-goal-release:
             description: The Maven goal used deploy project for releases
             required: false
-            default: '--activate-profiles mavencentral deploy'
+            default: '--activate-profiles gpgsigning,mavencentral deploy'
             type: string
 
         site-goal-run:
