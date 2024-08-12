@@ -126,16 +126,17 @@ jobs:
           exclude: ${{ fromJSON( inputs.matrix-exclude ) }}
   
     steps:
-      - name: install dependencies
+      - name: Install dependencies
         run: sudo apt update && sudo apt install git -y
       ## Environment setup
       # checkout the repository
-      - uses: actions/checkout@v4
+      - name: Source checkout
+        uses: actions/checkout@v4
         with:
           submodules: recursive
           fetch-depth: 0
       # Setups git user name and email
-      - name: Set up git User
+      - name: Setup git User
         run: |
           git config --global user.name github-actions
           git config --global user.email github-actions@github.com        
@@ -146,7 +147,7 @@ jobs:
         with:
             maven-version: ${{ matrix.maven }}  
      # Installs the JDK
-      - name: Set up JDK
+      - name: Setup JDK
         uses: actions/setup-java@v4
         with:
           distribution: ${{ matrix.distribution }}
@@ -154,8 +155,8 @@ jobs:
           check-latest: true
           # cache: 'maven'
       # Setup maven version as a wrapper
-      - name: Set up Maven Wrapper
-        run: >
+      - name: Setup Maven Wrapper
+        run: |
           mvn ${{ inputs.maven-args }} wrapper:wrapper \
               -Dmaven="${{ matrix.maven }}"
 
@@ -165,43 +166,43 @@ jobs:
 
       # Build and test
       - name: Build and Test with Maven
-        run: >
+        run: |
           ./mvnw ${{ inputs.maven-args }} ${{ inputs.verify-goal }}
 
       # Check quality with SonarQube
         ### THIS STEP MUST BE ENABLED BY CONFIGURING: 
         ###      SONAR_URL and SONAR_TOKEN secrets.
       - name: Quality check with Sonarqube
-        shell: bash
         if: ${{ inputs.quality-goal-run == 'true' }} && env.SONAR_URL != null && env.SONAR_TOKEN != null
-        run: >
+        run: |
           ./mvnw ${{ inputs.maven-args }} ${{ inputs.quality-goal }}
 
-      # Stage artifact
-      - name: Stage artifacts
-        run: ${{ inputs.staging-command }}
+      # Stage artifact to github
+      - name: Build artifacts archive
         if: ${{ inputs.staging-goal-run == 'true' }}
-      - uses: actions/upload-artifact@v4
+        run: ${{ inputs.staging-command }}
+      - name: Upload artifacts archive
+        uses: actions/upload-artifact@v4
         if: ${{ inputs.staging-goal-run == 'true' }}
         with:
           name: Package
           path: staging
       
-      # Publish package
-      - name: Publish package
+      # Publish artefact
+      - name: Deploy artefact
         if: ${{ inputs.deploy-goal-run == 'true' }}
-        run: >
+        run: |
           ./mvnw ${{ inputs.maven-args }} ${{ inputs.deploy-goal }}
       
       ## Build and deploy project site      
-      - name: Install SSH Key
-        if: ${{ inputs.site-goal-run == 'true' }} && ${{github.ref == 'refs/heads/develop'}}
+      - name: Load SSH Key in agent
         uses: webfactory/ssh-agent@v0.9.0
+        if: ${{ inputs.site-goal-run == 'true' }} && ${{github.ref == 'refs/heads/develop'}}
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-      - name: Build and deploy site with Maven
+      - name: Build and deploy website with Maven
         if: ${{ inputs.site-goal-run == 'true' }} && ${{github.ref == 'refs/heads/develop'}}
         run: |
           mkdir -p ~/.ssh/ && touch ~/.ssh/known_hosts
           ssh-keyscan github.com >> ~/.ssh/known_hosts
-          ./mvnw ${{ inputs.maven-args }} ${{ inputs.site-goal }}
+          ./mvnw ${{ inputs.maven-args }} ${{ inputs.site-goal }}-
