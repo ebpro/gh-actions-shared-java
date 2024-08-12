@@ -73,7 +73,7 @@ on:
         deploy-goal-release:
             description: The Maven goal used deploy project for releases
             required: false
-            default: '--activate-profiles nexus deploy'
+            default: '--activate-profiles mavencentral deploy'
             type: string
 
         site-goal-run:
