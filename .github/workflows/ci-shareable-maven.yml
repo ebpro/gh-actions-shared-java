@@ -12,7 +12,7 @@ on:
         maven-args:
           description: The arguments to pass to all Maven commands when building the code
           required: false
-          default: '-D"invoker.streamLogsOnFailures"'
+          default: '-D"invoker.streamLogsOnFailures" --errors --batch-mode --show-version --update-snapshots --settings ci-utils-java/ci-settings.xml --color always --no-transfer-progress'
           type: string
   
         jdk-matrix:
@@ -42,7 +42,7 @@ on:
         verify-goal:
           description: The Maven goal used to verify jobs
           required: false
-          default: 'verify'
+          default: '--activate-profiles gpgsigning verify'
           type: string
 
         quality-goal-run:
@@ -65,16 +65,26 @@ on:
             required: false
             default: 'false'
             type: string
-        deploy-goal:
+        deploy-goal-develop:
             description: The Maven goal used deploy project
             required: false
-            default: 'deploy'
+            default: '--activate-profiles github deploy'
+            type: string
+        deploy-goal-release:
+            description: The Maven goal used deploy project for releases
+            required: false
+            default: '--activate-profiles nexus deploy'
             type: string
 
         site-goal-run:
             description: Should genarate and deploy the website ?
             required: false
             default: 'false'
+            type: string
+        site-goal-branch:
+            description: The code branch source of the website
+            required: false
+            default: 'develop'
             type: string
         site-goal:
             description: The Maven goal used to build and deploy web site
@@ -189,19 +199,23 @@ jobs:
           path: staging
       
       # Publish artefact
-      - name: Deploy artefact
-        if: ${{ inputs.deploy-goal-run == 'true' }}
+      - name: Deploy develop artefact
+        if: ${{ inputs.deploy-goal-run == 'true' && (github.ref.name != 'master') }}
         run: |
-          ./mvnw ${{ inputs.maven-args }} ${{ inputs.deploy-goal }}
+          ./mvnw ${{ inputs.maven-args }} ${{ inputs.deploy-goal-develop }}
+      - name: Deploy release artefact
+        if: ${{ inputs.deploy-goal-run == 'true' && (github.ref.name == 'master') }}
+        run: |
+          ./mvnw ${{ inputs.maven-args }} ${{ inputs.deploy-goal-release }}
       
       ## Build and deploy project site      
       - name: Load SSH Key in agent
-        if: ${{ (inputs.site-goal-run == 'true') && (github.ref == 'refs/heads/develop') }}
+        if: ${{ (inputs.site-goal-run == 'true') && (github.ref.name == inputs.site-goal-branch) }}
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: Build and deploy website with Maven
-        if: ${{ (inputs.site-goal-run == 'true')  && (github.ref == 'refs/heads/develop') }}
+        if: ${{ (inputs.site-goal-run == 'true')  && (github.ref.name == inputs.site-goal-branch) }}
         run: |
           mkdir -p ~/.ssh/ && touch ~/.ssh/known_hosts
           ssh-keyscan github.com >> ~/.ssh/known_hosts
