@@ -18,7 +18,7 @@ on:
         jdk-matrix:
           description: jdk matrix as json array
           required: false
-          default: '[ "17" ]'
+          default: '[ "21" ]'
           type: string
   
         jdk-distribution-matrix:
@@ -30,7 +30,7 @@ on:
         maven-matrix:
           description: The Maven version matrix as json array
           required: false
-          default: '[ "3.8.8" ]'
+          default: '[ "3.9.8" ]'
           type: string
   
         matrix-exclude:
@@ -44,7 +44,12 @@ on:
           required: false
           default: 'verify'
           type: string
-        
+
+        quality-goal-run:
+            description: Should run quality ?
+            required: false
+            default: false
+            type: boolean
         quality-goal:
             description: The Maven goal used to check code quality
             required: false
@@ -55,24 +60,38 @@ on:
               sonar:sonar
             type: string      
 
+        deploy-goal-run:
+            description: Should deploy ?
+            required: false
+            default: false
+            type: boolean
         deploy-goal:
             description: The Maven goal used deploy project
             required: false
             default: 'deploy'
             type: string
 
+        site-goal-run:
+            description: Should genarate and deploy the website ?
+            required: false
+            default: false
+            type: boolean
         site-goal:
             description: The Maven goal used to build and deploy web site
             required: false
             default: 'site:site site-deploy'
             type: string
 
+        staging-goal-run:
+            description: Should stage artefacts ?
+            required: false
+            default: false
+            type: boolean
         staging-command:
             description: The command to make a staging directory containing artefacts.
             required: false
             default: 'mkdir staging && find ./target -name \*.[jwe]ar -exec cp {} ./staging \; && ls staging'
             type: string
-
 env:
   GITHUBACTOR: ${{ secrets.GITHUBACTOR }}
   GITHUBTOKEN: ${{ secrets.GITHUBTOKEN }}
@@ -137,7 +156,7 @@ jobs:
       # Setup maven version as a wrapper
       - name: Set up Maven Wrapper
         run: >
-          mvn ${{ inputs.maven-args }} org.apache.maven.plugins:maven-wrapper-plugin:3.2.0:wrapper \
+          mvn ${{ inputs.maven-args }} wrapper:wrapper \
               -Dmaven="${{ matrix.maven }}"
 
       - name: Extract branch name
@@ -150,35 +169,38 @@ jobs:
           ./mvnw ${{ inputs.maven-args }} ${{ inputs.verify-goal }}
 
       # Check quality with SonarQube
-        ### THIS STEP MUST BE ENABLED BY CONFIGURING: SONAR_URL and SONAR_TOKEN secrets.
+        ### THIS STEP MUST BE ENABLED BY CONFIGURING: 
+        ###      SONAR_URL and SONAR_TOKEN secrets.
       - name: Quality check with Sonarqube
         shell: bash
-        if: env.SONAR_URL != null && env.SONAR_TOKEN != null
+        if: ${{inputs.quality-goal-run}} && env.SONAR_URL != null && env.SONAR_TOKEN != null
         run: >
           ./mvnw ${{ inputs.maven-args }} ${{ inputs.quality-goal }}
 
       # Stage artifact
       - name: Stage artifacts
         run: ${{ inputs.staging-command }}
+        if: ${{inputs.staging-goal-run}}
       - uses: actions/upload-artifact@v4
+        if: ${{inputs.staging-goal-run}}
         with:
           name: Package
           path: staging
       
       # Publish package
       - name: Publish package
+        if: ${{inputs.deploy-goal-run}}
         run: >
           ./mvnw ${{ inputs.maven-args }} ${{ inputs.deploy-goal }}
       
       ## Build and deploy project site      
       - name: Install SSH Key
-        if: ${{github.ref == 'refs/heads/develop'}}
+        if: ${{inputs.site-goal-run}} && ${{github.ref == 'refs/heads/develop'}}
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
       - name: Build and deploy site with Maven
-        if: ${{github.ref == 'refs/heads/develop'}}
+        if: ${{inputs.site-goal-run}} && ${{github.ref == 'refs/heads/develop'}}
         run: |
           mkdir -p ~/.ssh/ && touch ~/.ssh/known_hosts
           ssh-keyscan github.com >> ~/.ssh/known_hosts
