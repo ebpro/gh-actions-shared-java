@@ -173,16 +173,16 @@ jobs:
         ###      SONAR_URL and SONAR_TOKEN secrets.
       - name: Quality check with Sonarqube
         shell: bash
-        if: ${{ inputs.quality-goal-run == 'false' }} && env.SONAR_URL != null && env.SONAR_TOKEN != null
+        if: ${{ inputs.quality-goal-run == 'true' }} && env.SONAR_URL != null && env.SONAR_TOKEN != null
         run: >
           ./mvnw ${{ inputs.maven-args }} ${{ inputs.quality-goal }}
 
       # Stage artifact
       - name: Stage artifacts
         run: ${{ inputs.staging-command }}
-        if: ${{ inputs.staging-goal-run == 'false' }}
+        if: ${{ inputs.staging-goal-run == 'true' }}
       - uses: actions/upload-artifact@v4
-        if: ${{ inputs.staging-goal-run == 'false' }}
+        if: ${{ inputs.staging-goal-run == 'true' }}
         with:
           name: Package
           path: staging
@@ -195,12 +195,12 @@ jobs:
       
       ## Build and deploy project site      
       - name: Install SSH Key
-        if: ${{ inputs.site-goal-run == 'false' }} && ${{github.ref == 'refs/heads/develop'}}
+        if: ${{ inputs.site-goal-run == 'true' }} && ${{github.ref == 'refs/heads/develop'}}
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: Build and deploy site with Maven
-        if: ${{inputs.site-goal-run}} && ${{github.ref == 'refs/heads/develop'}}
+        if: ${{ inputs.site-goal-run == 'true' }} && ${{github.ref == 'refs/heads/develop'}}
         run: |
           mkdir -p ~/.ssh/ && touch ~/.ssh/known_hosts
           ssh-keyscan github.com >> ~/.ssh/known_hosts
