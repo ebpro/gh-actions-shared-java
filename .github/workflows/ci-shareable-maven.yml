@@ -173,7 +173,7 @@ jobs:
         ### THIS STEP MUST BE ENABLED BY CONFIGURING: 
         ###      SONAR_URL and SONAR_TOKEN secrets.
       - name: Quality check with Sonarqube
-        if: ${{ inputs.quality-goal-run == 'true' }} && env.SONAR_URL != null && env.SONAR_TOKEN != null
+        if: ${{ (inputs.quality-goal-run == 'true') && (env.SONAR_URL != null) && (env.SONAR_TOKEN != null) }}
         run: |
           ./mvnw ${{ inputs.maven-args }} ${{ inputs.quality-goal }}
 
@@ -196,12 +196,12 @@ jobs:
       
       ## Build and deploy project site      
       - name: Load SSH Key in agent
-        if: ${{ inputs.site-goal-run == 'true' }} && ${{github.ref == 'refs/heads/develop'}}
+        if: ${{ (inputs.site-goal-run == 'true') && (github.ref == 'refs/heads/develop') }}
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: Build and deploy website with Maven
-        if: ${{ inputs.site-goal-run == 'true' }} && ${{github.ref == 'refs/heads/develop'}}
+        if: ${{ (inputs.site-goal-run == 'true')  && (github.ref == 'refs/heads/develop') }}
         run: |
           mkdir -p ~/.ssh/ && touch ~/.ssh/known_hosts
           ssh-keyscan github.com >> ~/.ssh/known_hosts
