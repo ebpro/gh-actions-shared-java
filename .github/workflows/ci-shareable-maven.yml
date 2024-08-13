@@ -138,8 +138,8 @@ jobs:
           exclude: ${{ fromJSON( inputs.matrix-exclude ) }}
   
     steps:
-      - name: Install dependencies
-        run: sudo apt update && sudo apt install git -y
+      ###- name: Install dependencies
+      ###  run: sudo apt update && sudo apt install git -y
       ## Environment setup
       # checkout the repository
       - name: Source checkout
@@ -154,17 +154,17 @@ jobs:
           git config --global user.email github-actions@github.com        
       # Maven is not installed in self hosted
       # so we install one (see wrapper below for the right version)
-      - name: Set up Maven
-        uses: stCarolas/setup-maven@v5
-        with:
-            maven-version: ${{ matrix.maven }}  
+      ###- name: Set up Maven
+      ###  uses: stCarolas/setup-maven@v5
+      ###  with:
+      ###      maven-version: ${{ matrix.maven }}  
      # Installs the JDK
-      - name: Setup JDK
-        uses: actions/setup-java@v4
-        with:
-          distribution: ${{ matrix.distribution }}
-          java-version: ${{ matrix.jdk }}
-          check-latest: true
+      ###- name: Setup JDK
+      ###  uses: actions/setup-java@v4
+      ###  with:
+      ###    distribution: ${{ matrix.distribution }}
+      ###    java-version: ${{ matrix.jdk }}
+      ###    check-latest: true
           # cache: 'maven'
       # Setup maven version as a wrapper
       - name: Setup Maven Wrapper
