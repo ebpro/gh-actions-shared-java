@@ -68,12 +68,12 @@ on:
         deploy-goal-develop:
             description: The Maven goal used deploy project
             required: false
-            default: '--activate-profiles gpgsigning,github install:install deploy:deploy'
+            default: '--activate-profiles gpgsigning,github'
             type: string
         deploy-goal-release:
             description: The Maven goal used deploy project for releases
             required: false
-            default: '--activate-profiles gpgsigning,mavencentral deploy'
+            default: '--activate-profiles gpgsigning,mavencentral'
             type: string
 
         site-goal-run:
@@ -209,11 +209,11 @@ jobs:
       - name: Deploy develop artefact
         if: ${{ inputs.deploy-goal-run == 'true' && (github.ref_name != 'master') }}
         run: |
-          source "/home/runner/.sdkman/bin/sdkman-init.sh" && ./mvnw ${{ inputs.maven-args }} ${{ inputs.deploy-goal-develop }}
+          source "/home/runner/.sdkman/bin/sdkman-init.sh" && ./mvnw ${{ inputs.maven-args }} ${{ inputs.deploy-goal-develop }} install:install deploy:deploy
       - name: Deploy release artefact
         if: ${{ inputs.deploy-goal-run == 'true' && (github.ref_name == 'master') }}
         run: |
-          source "/home/runner/.sdkman/bin/sdkman-init.sh" && ./mvnw ${{ inputs.maven-args }} ${{ inputs.deploy-goal-release }}
+          source "/home/runner/.sdkman/bin/sdkman-init.sh" && ./mvnw ${{ inputs.maven-args }} ${{ inputs.deploy-goal-release }} install:install deploy:deploy
       
       ## Build and deploy project site      
       - name: Load SSH Key in agent
