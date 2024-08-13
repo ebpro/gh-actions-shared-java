@@ -174,7 +174,7 @@ jobs:
       # Setup maven version as a wrapper
       - name: Setup Maven Wrapper
         run: |
-          mvn ${{ inputs.maven-args }} wrapper:wrapper \
+          source "/home/runner/.sdkman/bin/sdkman-init.sh" && mvn ${{ inputs.maven-args }} wrapper:wrapper \
               -Dmaven="${{ matrix.maven }}"
 
       - name: Extract branch name
