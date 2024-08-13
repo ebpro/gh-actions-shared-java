@@ -133,7 +133,7 @@ jobs:
     # Set bash as tyhe default shell
     defaults:
       run:
-        shell: bash
+        shell: bash -leo pipefail {0}
     
     strategy:
         matrix:
