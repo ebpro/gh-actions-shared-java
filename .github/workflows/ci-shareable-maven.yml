@@ -18,13 +18,13 @@ on:
         jdk-matrix:
           description: jdk matrix as json array
           required: false
-          default: '[ "21" ]'
+          default: '[ "21.0.4" ]'
           type: string
   
         jdk-distribution-matrix:
           description: jdk distribution matrix
           required: false
-          default: '[ "temurin" ]'
+          default: '[ "tem" ]'
           type: string
   
         maven-matrix:
@@ -152,6 +152,18 @@ jobs:
         run: |
           git config --global user.name github-actions
           git config --global user.email github-actions@github.com        
+      
+      - name: Setup JDK
+        uses: sdkman/sdkman-action@v1
+        with:
+            candidate: java
+            version: ${{ matrix.jdk }}-${{ matrix.distribution }}
+      - name: Setup Maven
+        uses: sdkman/sdkman-action@v1
+        with:
+            candidate: maven
+            version: ${{ matrix.maven }}
+      
       # Maven is not installed in self hosted
       # so we install one (see wrapper below for the right version)
       ###- name: Set up Maven
