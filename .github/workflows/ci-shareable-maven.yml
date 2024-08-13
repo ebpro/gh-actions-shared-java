@@ -12,7 +12,7 @@ on:
         maven-args:
           description: The arguments to pass to all Maven commands when building the code
           required: false
-          default: '-D"invoker.streamLogsOnFailures" --errors --batch-mode --show-version --update-snapshots --settings ci-utils-java/ci-settings.xml --color always --no-transfer-progress'
+          default: '-Dmaven.repo.local=/opt/cache/m2/repository/ -D"invoker.streamLogsOnFailures" --errors --batch-mode --show-version --update-snapshots --settings ci-utils-java/ci-settings.xml --color always --no-transfer-progress'
           type: string
   
         jdk-matrix:
