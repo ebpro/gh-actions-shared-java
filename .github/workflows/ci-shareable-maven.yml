@@ -130,6 +130,11 @@ jobs:
     # The tags to select the runner
     runs-on: ${{ inputs.runs-on }}
 
+    # Set bash as tyhe default shell
+    defaults:
+      run:
+        shell: bash
+    
     strategy:
         matrix:
           jdk: ${{ fromJSON( inputs.jdk-matrix ) }}
@@ -151,19 +156,7 @@ jobs:
       - name: Setup git User
         run: |
           git config --global user.name github-actions
-          git config --global user.email github-actions@github.com        
-      
-      - name: Setup JDK
-        uses: sdkman/sdkman-action@v1
-        with:
-            candidate: java
-            version: ${{ matrix.jdk }}-${{ matrix.distribution }}
-      - name: Setup Maven
-        uses: sdkman/sdkman-action@v1
-        with:
-            candidate: maven
-            version: ${{ matrix.maven }}
-      
+          git config --global user.email github-actions@github.com                    
       # Maven is not installed in self hosted
       # so we install one (see wrapper below for the right version)
       ###- name: Set up Maven
