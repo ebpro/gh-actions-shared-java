@@ -4,7 +4,7 @@ name: Java CI (shareable)
 on:
     workflow_call:
       inputs:
-        runs-on:
+        runs-on: ebpro-org
           description: The runner to use
           required: false
           default: '[ self-hosted, Linux ]'
