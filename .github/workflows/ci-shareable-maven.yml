@@ -7,7 +7,7 @@ on:
         runs-on:
           description: The runner to use
           required: false
-          default: '[ self-hosted, Linux ]'
+          default: '["ebpro-org","linux","x64"]'
           type: string
         maven-args:
           description: The arguments to pass to all Maven commands when building the code
@@ -128,7 +128,7 @@ jobs:
   maven-build-test-site:
     name: jdk-${{ matrix.jdk }}-${{ matrix.distribution }} ${{ matrix.maven }}
     # The tags to select the runner
-    runs-on: ${{ inputs.runs-on }}
+    runs-on: ${{ startsWith(inputs.runs-on, '[') && fromJSON(inputs.runs-on) || inputs.runs-on }}
 
     # Set bash as tyhe default shell
     defaults:
