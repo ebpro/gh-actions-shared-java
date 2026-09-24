@@ -24,7 +24,7 @@ on:
         jdk-distribution-matrix:
           description: jdk distribution matrix
           required: false
-          default: '[ "tem" ]'
+          default: '[ "temurin" ]'
           type: string
   
         maven-matrix:
