@@ -117,6 +117,8 @@ env:
   MAVEN_PROXY_TOKEN: ${{ secrets.MAVEN_PROXY_TOKEN }}
   MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
   MAVEN_CENTRAL_TOKEN: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
+  NEXUS_USERNAME: ${{ secrets.NEXUS_USERNAME }}
+  NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
   
 # allow single build per branch or PR
 concurrency:
