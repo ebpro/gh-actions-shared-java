@@ -169,6 +169,18 @@ jobs:
         shell: bash
         run: echo "MY_BRANCH=$(git rev-parse --abbrev-ref HEAD | tr / _)" >> $GITHUB_ENV
 
+      # Purge corrupted local repo artifacts (HTML pages cached as .pom files)
+      - name: Purge corrupted local repo artifacts
+        run: |
+          REPO_DIR="/opt/cache/m2/repository"
+          if [ -d "$REPO_DIR" ]; then
+            find "$REPO_DIR" -name "*.pom" -exec grep -l "<!DOCTYPE html" {} \; 2>/dev/null | xargs -r rm -f 2>/dev/null || true
+            find "$REPO_DIR" -name "*.lastUpdated" -delete 2>/dev/null || true
+            echo "Purged corrupted artifacts from $REPO_DIR"
+          else
+            echo "No persistent repo at $REPO_DIR, skipping"
+          fi
+
       # Build and test
       - name: Build and Test with Maven
         run: |
