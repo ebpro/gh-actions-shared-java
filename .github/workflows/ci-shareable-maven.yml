@@ -160,18 +160,49 @@ jobs:
           git config --global user.name github-actions
           git config --global user.email github-actions@github.com                    
       # Installs the JDK
+      # NOTE: setup-java's `cache: maven` option is deliberately NOT used. It
+      # saves/restores ~/.m2/repository, but every ./mvnw call below overrides the
+      # local repository with -Dmaven.repo.local=/opt/cache/m2/repository (see the
+      # maven-args input), so that cache is written to and read from a directory
+      # Maven never uses — it cost storage and gave false confidence while every
+      # build re-downloaded the full dependency tree. The working cache step is
+      # immediately below, keyed on the path Maven actually uses.
       - name: Setup JDK
         uses: actions/setup-java@v6
         with:
           distribution: ${{ matrix.distribution }}
           java-version: ${{ matrix.jdk }}
-          cache: 'maven'
+
+      # 2026-10-24: Maven dependency cache.
+      # The runner image (arcrunner/Dockerfile) creates /opt/cache/m2/repository
+      # and chowns it to uid 1001, but ships it EMPTY and no volume/PVC is mounted
+      # onto it by the ARC scale sets — so before this step it was a per-pod
+      # scratch directory, i.e. effectively no caching at all.
+      # Both candidate paths are cached so the step still works if a consumer
+      # overrides `maven-args` without -Dmaven.repo.local (then Maven falls back
+      # to ~/.m2/repository).
+      # Cache transport: every scale set sets ACTIONS_RESULTS_URL=
+      # http://cache-server.ci.svc:3000/ on the runner container, so actions/cache
+      # is served by the in-cluster github-actions-cache-server, not GitHub.
+      - name: Cache Maven local repository
+        uses: actions/cache@v4
+        with:
+          path: |
+            /opt/cache/m2/repository
+            ~/.m2/repository
+          key: m2-${{ runner.os }}-${{ matrix.distribution }}-${{ matrix.jdk }}-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            m2-${{ runner.os }}-${{ matrix.distribution }}-${{ matrix.jdk }}-
+            m2-${{ runner.os }}-${{ matrix.distribution }}-
+            m2-${{ runner.os }}-
 
       - name: Extract branch name
         shell: bash
         run: echo "MY_BRANCH=$(git rev-parse --abbrev-ref HEAD | tr / _)" >> $GITHUB_ENV
 
       # Purge corrupted local repo artifacts (HTML pages cached as repo files)
+      # Runs AFTER the cache restore, which is what makes it useful: corruption
+      # inherited from a previous build now arrives via the restored cache.
       - name: Purge corrupted local repo artifacts
         run: |
           REPO_DIR="/opt/cache/m2/repository"
